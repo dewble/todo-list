@@ -2,6 +2,7 @@ package app
 
 import (
 	"encoding/json"
+	"example/todolist2/model"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -27,7 +28,8 @@ func TestTodos(t *testing.T) {
 
 	// 	rd.JSON(w, http.StatusCreated, todo) 읽어보기
 
-	var todo Todo
+	// refactoring 하며 todo -> model.Todo로 변경
+	var todo model.Todo
 	err = json.NewDecoder(resp.Body).Decode(&todo)
 	assert.NoError(err)
 	assert.Equal(todo.Name, "Test todo")
@@ -60,7 +62,7 @@ func TestTodos(t *testing.T) {
 	resp, err = http.Get(ts.URL + "/todos")
 	assert.NoError(err)
 	assert.Equal(http.StatusOK, resp.StatusCode)
-	todos := []*Todo{}
+	todos := []*model.Todo{}
 
 	// JSON 으로 읽어오기
 	err = json.NewDecoder(resp.Body).Decode(&todos)
@@ -108,7 +110,7 @@ func TestTodos(t *testing.T) {
 	resp, err = http.Get(ts.URL + "/todos")
 	assert.NoError(err)
 	assert.Equal(http.StatusOK, resp.StatusCode)
-	todos = []*Todo{}
+	todos = []*model.Todo{}
 
 	// JSON 으로 읽어오기
 	err = json.NewDecoder(resp.Body).Decode(&todos)
@@ -137,7 +139,7 @@ func TestTodos(t *testing.T) {
 	resp, err = http.Get(ts.URL + "/todos")
 	assert.NoError(err)
 	assert.Equal(http.StatusOK, resp.StatusCode)
-	todos = []*Todo{}
+	todos = []*model.Todo{}
 
 	// JSON 으로 읽어오기
 	err = json.NewDecoder(resp.Body).Decode(&todos)
