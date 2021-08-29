@@ -96,7 +96,7 @@ func (a *AppHandler) Close() {
 	a.db.Close()
 }
 
-func MakeHandler() *AppHandler {
+func MakeHandler(filepath string) *AppHandler {
 	// todoMap = make(map[int]*Todo)
 	// todoMap[1] = &Todo{1, "num1", false, time.Now()}
 	// todoMap[2] = &Todo{2, "num2", true, time.Now()}
@@ -105,11 +105,11 @@ func MakeHandler() *AppHandler {
 	// addTestTodos()
 
 	r := mux.NewRouter()
-
 	a := &AppHandler{
 		Handler: r,
 		// db 는 NewDBHandler()를 호출해서 결과값 저장
-		db: model.NewDBHandler(),
+
+		db: model.NewDBHandler(filepath),
 	}
 
 	r.HandleFunc("/todos", a.getTodoListHandler).Methods("GET")

@@ -1,8 +1,6 @@
 package model
 
-import (
-	"time"
-)
+import "time"
 
 type Todo struct {
 	ID        int       `json:"id"`
@@ -21,12 +19,10 @@ type DBHandler interface {
 	Close()
 }
 
-var handler DBHandler
-
 // NewDBHandler() 를 만들어 이 인터페이스 자체를 외부로 노출하고 안에 아래 function 이동
-func NewDBHandler() DBHandler {
-
-	return newSqliteHandler()
+func NewDBHandler(filepath string) DBHandler {
+	//handler = newMemoryHandler()
+	return newSqliteHandler(filepath)
 }
 
 /*

@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"os"
 	"strconv"
 	"testing"
 
@@ -14,8 +15,16 @@ import (
 )
 
 func TestTodos(t *testing.T) {
+
+	// db를 지워주지 않고 테스트를 다시하면 db에 테스트값이 더해져 테스트 오류 발생
+	os.Remove("./test.db")
 	assert := assert.New(t)
-	ts := httptest.NewServer(MakeHandler())
+
+	// app handler, db 닫아주기
+	ah := MakeHandler("./test.db")
+	defer ah.Close()
+
+	ts := httptest.NewServer(ah)
 	defer ts.Close()
 
 	/*
