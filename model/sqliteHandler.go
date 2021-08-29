@@ -6,33 +6,33 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-type sqlliteHandler struct {
+type sqliteHandler struct {
 	db *sql.DB
 }
 
 // 인터페이스를 implement , func(m *memoryHandler)
-func (s *sqlliteHandler) getTodos() []*Todo {
+func (s *sqliteHandler) GetTodos() []*Todo {
 	return nil
 }
-func (s *sqlliteHandler) addTodo(name string) *Todo {
+func (s *sqliteHandler) AddTodo(name string) *Todo {
 	return nil
 }
-func (s *sqlliteHandler) removeTodo(id int) bool {
+func (s *sqliteHandler) RemoveTodo(id int) bool {
 	return false
 }
 
-func (s *sqlliteHandler) completeTodo(id int, complete bool) bool {
+func (s *sqliteHandler) CompleteTodo(id int, complete bool) bool {
 	return false
 
 }
 
 // 종료되기전에 db를 닫아준다
-func (s *sqlliteHandler) close() {
+func (s *sqliteHandler) close() {
 	s.db.Close()
 
 }
 
-func newSqliteHandler() dbHandler {
+func newSqliteHandler() DBHandler {
 	database, err := sql.Open("sqlite3", "./test.db")
 	if err != nil {
 		panic(err)
@@ -53,5 +53,7 @@ func newSqliteHandler() dbHandler {
 
 	// 실행
 	statement.Exec()
-	return &sqlliteHandler{}
+
+	// sqliteHandler 의 멤버변수 db 에 저장해준다
+	return &sqliteHandler{db: database}
 }

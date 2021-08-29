@@ -10,6 +10,9 @@ import (
 
 func main() {
 	m := app.MakeHandler()
+
+	// app이 종료되기전에 Close 호출
+	defer m.Close()
 	n := negroni.Classic()
 	n.UseHandler(m)
 
