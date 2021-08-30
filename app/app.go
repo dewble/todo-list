@@ -3,11 +3,15 @@ package app
 import (
 	"example/todolist2/model"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/gorilla/mux"
+	"github.com/gorilla/sessions"
 	"github.com/unrolled/render"
 )
+
+var store = sessions.NewCookieStore([]byte(os.Getenv("SESSION_KEY")))
 
 var rd *render.Render = render.New()
 
@@ -117,6 +121,12 @@ func MakeHandler(filepath string) *AppHandler {
 	r.HandleFunc("/todos/{id:[0-9]+}", a.removeTodoHandler).Methods("DELETE")
 	r.HandleFunc("/complete-todo/{id:[0-9]+}", a.completeTodoHandler).Methods("GET")
 	r.HandleFunc("/", a.indexHandler)
+
+	// login page
+	// 핸들러 생성, google에 로그인 요청
+	r.HandleFunc("/auth/google/login", googleLoginHandler)
+	// 핸들러 생성,
+	r.HandleFunc("/auth/google/callback", googleAuthCallback)
 
 	return a
 }
