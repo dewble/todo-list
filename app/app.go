@@ -5,12 +5,16 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	"github.com/unrolled/render"
+	"github.com/urfave/negroni"
 )
 
+// 쿠키스토어를 만든다.
+// SESSION_KEY 라는 환경 변수를 만들어주고 가져와서 사용한다.
 var store = sessions.NewCookieStore([]byte(os.Getenv("SESSION_KEY")))
 
 var rd *render.Render = render.New()
@@ -47,6 +51,22 @@ func (a *AppHandler) addTodoHandler(w http.ResponseWriter, r *http.Request) {
 
 type Success struct {
 	Success bool `json:"success"`
+}
+
+// 쿠키에서 세션을 읽어오는 세션을 만든다. signin.go 에 작성한것과 같이 작성
+func getSessionID(r *http.Request) string {
+	session, err := store.Get(r, "session")
+	if err != nil {
+		return ""
+	}
+
+	val := session.Values["id"]
+	// 비어있는지 체크 -> 로그인을 안했다는 경우
+	if val == nil {
+		return ""
+	}
+	// 비어있지 않을 경우 string으로 변경해서 return
+	return val.(string)
 }
 
 func (a *AppHandler) removeTodoHandler(w http.ResponseWriter, r *http.Request) {
@@ -100,6 +120,26 @@ func (a *AppHandler) Close() {
 	a.db.Close()
 }
 
+func CheckSignin(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	// 유저가 요청한 url이 signin.html 일경우 next()로 넘겨줘야한다. 그렇지 않을경우 무한루프
+	if strings.Contains(r.URL.Path, "/signin.html") || strings.Contains(r.URL.Path, "/auth") {
+		next(w, r)
+		return
+	}
+
+	// 세션 ID가 쿠키에 있느냐로 signed in 여부 판단
+	// if user already signed in
+	sessionID := getSessionID(r)
+	if sessionID != "" {
+		next(w, r)
+		return
+	}
+
+	// if not user signed in -> redirect singin.html
+	http.Redirect(w, r, "/signin.html", http.StatusTemporaryRedirect)
+
+}
+
 func MakeHandler(filepath string) *AppHandler {
 	// todoMap = make(map[int]*Todo)
 	// todoMap[1] = &Todo{1, "num1", false, time.Now()}
@@ -109,8 +149,19 @@ func MakeHandler(filepath string) *AppHandler {
 	// addTestTodos()
 
 	r := mux.NewRouter()
+
+	// main.go 에 있던것을 가져와서 사용
+	// 세션아이디를 체크하고 있으면 sign 없으면 login화면으로 넘긴다
+	// 순서대로 확인한다. chain으로 되어있다
+	n := negroni.New(
+		negroni.NewRecovery(),
+		negroni.NewLogger(),
+		negroni.HandlerFunc(CheckSignin),
+		negroni.NewStatic(http.Dir("public")))
+	n.UseHandler(r)
+
 	a := &AppHandler{
-		Handler: r,
+		Handler: n,
 		// db 는 NewDBHandler()를 호출해서 결과값 저장
 
 		db: model.NewDBHandler(filepath),
