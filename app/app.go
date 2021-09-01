@@ -36,13 +36,15 @@ func (a *AppHandler) getTodoListHandler(w http.ResponseWriter, r *http.Request) 
 	// 	list = append(list, v)
 	// }
 
-	list := a.db.GetTodos()
+	sessionId := getSessionID(r)
+	list := a.db.GetTodos(sessionId)
 	rd.JSON(w, http.StatusOK, list)
 }
 
 func (a *AppHandler) addTodoHandler(w http.ResponseWriter, r *http.Request) {
+	sessionId := getSessionID(r)
 	name := r.FormValue("name")
-	todo := a.db.AddTodo(name)
+	todo := a.db.AddTodo(sessionId, name)
 	// id := len(todoMap) + 1
 	// todo := &Todo{id, name, false, time.Now()}
 	// todoMap[id] = todo

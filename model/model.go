@@ -12,8 +12,9 @@ type Todo struct {
 // 인터페이스 추가
 type DBHandler interface {
 	// close() 추가하고 , 외부로 공개
-	GetTodos() []*Todo
-	AddTodo(name string) *Todo
+	// seesionId argment 추가
+	GetTodos(sessionId string) []*Todo
+	AddTodo(seesionId string, name string) *Todo
 	RemoveTodo(id int) bool
 	CompleteTodo(id int, complete bool) bool
 	Close()

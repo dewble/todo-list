@@ -12,10 +12,12 @@ type sqliteHandler struct {
 }
 
 // 인터페이스를 implement , func(m *memoryHandler)
-func (s *sqliteHandler) GetTodos() []*Todo {
+func (s *sqliteHandler) GetTodos(sessionId string) []*Todo {
 	// 데이터를 읽어와서 반환해줘야한다. 그 반환값을 가지고 있을 list 를 가지고 있어야한다
 	todos := []*Todo{}
-	rows, err := s.db.Query("SELECT id,name,completed, createdAt FROM todos")
+
+	// 세션에 해당하는것만 가쟈온다
+	rows, err := s.db.Query("SELECT id,name,completed, createdAt FROM todos WHERE sessionId=?, sessionId")
 	if err != nil {
 		panic(err)
 	}
@@ -33,12 +35,12 @@ func (s *sqliteHandler) GetTodos() []*Todo {
 	return todos
 }
 
-func (s *sqliteHandler) AddTodo(name string) *Todo {
-	stmt, err := s.db.Prepare("INSERT INTO todos (name, completed, createdAt) VALUES (?,?, datetime('now'))")
+func (s *sqliteHandler) AddTodo(name string, sessionId string) *Todo {
+	stmt, err := s.db.Prepare("INSERT INTO todos (sessionId,name, completed, createdAt) VALUES (?, ?,?, datetime('now'))")
 	if err != nil {
 		panic(err)
 	}
-	rst, err := stmt.Exec(name, false)
+	rst, err := stmt.Exec(sessionId, name, false)
 	if err != nil {
 		panic(err)
 	}
@@ -108,10 +110,14 @@ func newSqliteHandler(filepath string) DBHandler {
 	statement, _ := database.Prepare(
 		`CREATE TABLE IF NOT EXISTS todos (
 			id        INTEGER  PRIMARY KEY AUTOINCREMENT,
+			sessionId STRING,
 			name      TEXT,
 			completed BOOLEAN,
 			createdAt DATETIME
-		)`)
+		);
+		CREATE INDEX IF NOT EXISTS sessionIdIndexOnTodos ON todos (
+			sessionId ASC
+		);`)
 
 	// 실행
 	statement.Exec()
