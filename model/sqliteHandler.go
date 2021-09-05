@@ -17,7 +17,7 @@ func (s *sqliteHandler) GetTodos(sessionId string) []*Todo {
 	todos := []*Todo{}
 
 	// 세션에 해당하는것만 가쟈온다
-	rows, err := s.db.Query("SELECT id,name,completed, createdAt FROM todos WHERE sessionId=?, sessionId")
+	rows, err := s.db.Query("SELECT id, name, completed, createdAt FROM todos WHERE sessionId=?", sessionId)
 	if err != nil {
 		panic(err)
 	}

@@ -10,6 +10,7 @@ type memoryHandler struct {
 }
 
 // 인터페이스를 implement , func(m *memoryHandler), 외부로 노출, close() 추가
+// sessionId argment 추가
 func (m *memoryHandler) GetTodos(sessionId string) []*Todo {
 	list := []*Todo{}
 	for _, v := range m.todoMap {

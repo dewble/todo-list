@@ -44,7 +44,7 @@ func (a *AppHandler) getTodoListHandler(w http.ResponseWriter, r *http.Request) 
 func (a *AppHandler) addTodoHandler(w http.ResponseWriter, r *http.Request) {
 	sessionId := getSessionID(r)
 	name := r.FormValue("name")
-	todo := a.db.AddTodo(sessionId, name)
+	todo := a.db.AddTodo(name, sessionId)
 	// id := len(todoMap) + 1
 	// todo := &Todo{id, name, false, time.Now()}
 	// todoMap[id] = todo
@@ -56,9 +56,13 @@ type Success struct {
 }
 
 // 쿠키에서 세션을 읽어오는 세션을 만든다. signin.go 에 작성한것과 같이 작성
-func getSessionID(r *http.Request) string {
+// - app.go 의 getSessionID를 func pointer를 가지는 var로 만든다.
+// - 엄밀히 따지면 함수는아니고 변수가 되어 다른곳에서 사용한다. 그 변수의 값은 func pointer를 가지고 있는것
+var getSessionID = func(r *http.Request) string {
+	// 테스트코드에선 빈문자열이 아닌것 처럼 return 해준다.
 	session, err := store.Get(r, "session")
 	if err != nil {
+		// 에러일 경우 빈문자열 리턴
 		return ""
 	}
 
@@ -124,7 +128,7 @@ func (a *AppHandler) Close() {
 
 func CheckSignin(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	// 유저가 요청한 url이 signin.html 일경우 next()로 넘겨줘야한다. 그렇지 않을경우 무한루프
-	if strings.Contains(r.URL.Path, "/signin.html") || strings.Contains(r.URL.Path, "/auth") {
+	if strings.Contains(r.URL.Path, "/signin") || strings.Contains(r.URL.Path, "/auth") {
 		next(w, r)
 		return
 	}

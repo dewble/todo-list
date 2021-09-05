@@ -16,6 +16,10 @@ import (
 
 func TestTodos(t *testing.T) {
 
+	getSessionID = func(r *http.Request) string {
+		return "testsessionId"
+	}
+
 	// db를 지워주지 않고 테스트를 다시하면 db에 테스트값이 더해져 테스트 오류 발생
 	os.Remove("./test.db")
 	assert := assert.New(t)
