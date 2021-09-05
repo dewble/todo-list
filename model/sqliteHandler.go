@@ -36,7 +36,7 @@ func (s *sqliteHandler) GetTodos(sessionId string) []*Todo {
 }
 
 func (s *sqliteHandler) AddTodo(name string, sessionId string) *Todo {
-	stmt, err := s.db.Prepare("INSERT INTO todos (sessionId,name, completed, createdAt) VALUES (?, ?,?, datetime('now'))")
+	stmt, err := s.db.Prepare("INSERT INTO todos (sessionId, name, completed, createdAt) VALUES (?, ?, ?, datetime('now'))")
 	if err != nil {
 		panic(err)
 	}
@@ -50,7 +50,6 @@ func (s *sqliteHandler) AddTodo(name string, sessionId string) *Todo {
 	todo.Name = name
 	todo.Completed = false
 	todo.CreatedAt = time.Now()
-
 	return &todo
 }
 
@@ -74,7 +73,7 @@ func (s *sqliteHandler) RemoveTodo(id int) bool {
 func (s *sqliteHandler) CompleteTodo(id int, complete bool) bool {
 	// 기존 레코드는 두고 completed 값만 변경
 
-	stmt, err := s.db.Prepare("UPDATE todos SET completed = ? WHERE id=?")
+	stmt, err := s.db.Prepare("UPDATE todos SET completed=? WHERE id=?")
 	if err != nil {
 		panic(err)
 	}

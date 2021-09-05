@@ -18,10 +18,10 @@ import (
 
 // callback 에서 받은 json 데이터를 파싱하여 저장
 type GoogleUserId struct {
-	ID           string `json:"id"`
-	Email        string `json:"email"`
-	VerfiedEmail bool   `json:"verified_email"`
-	Pciture      string `json:"picture"`
+	ID            string `json:"id"`
+	Email         string `json:"email"`
+	VerifiedEmail bool   `json:"verified_email"`
+	Picture       string `json:"picture"`
 }
 
 // 아래 컨피그를 통해서 oauth에 접근한다
@@ -93,9 +93,13 @@ func googleAuthCallback(w http.ResponseWriter, r *http.Request) {
 
 	// Get a session. We're ignoring the error resulted from decoding an
 	// existing session: Get() always returns a session, even if empty.
-	session, _ := store.Get(r, "session")
-	// Set some session values.
+	session, err := store.Get(r, "session")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
+	// Set some session values.
 	// 필요한 부분 추가
 	session.Values["id"] = "userInfo.ID"
 	// Save it before we write to the response/return from the handler.
@@ -104,7 +108,6 @@ func googleAuthCallback(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
 	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 }
 
