@@ -1,8 +1,8 @@
 package app
 
 import (
+	"dewble/todos/model"
 	"encoding/json"
-	"example/todolist2/model"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
