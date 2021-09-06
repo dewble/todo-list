@@ -1,7 +1,7 @@
 package app
 
 import (
-	"example/todolist2/model"
+	"dewble/todos/model"
 	"net/http"
 	"os"
 	"strconv"

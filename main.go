@@ -1,7 +1,7 @@
 package main
 
 import (
-	"example/todolist2/app"
+	"dewble/todos/app"
 	"log"
 	"net/http"
 )
