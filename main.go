@@ -16,7 +16,7 @@ func main() {
 	defer m.Close()
 
 	log.Println("Started App")
-	err := http.ListenAndServe(":port", m)
+	err := http.ListenAndServe(":"+port, m)
 	if err != nil {
 		panic(err)
 	}
