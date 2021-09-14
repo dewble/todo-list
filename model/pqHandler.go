@@ -106,15 +106,30 @@ func newPQHandler(dbConn string) DBHandler {
 	// 여러줄은 ``
 	// todos table이 없으면 만들어라
 	// AUTOINCREMENT 값이 자동으로 하나씩 증가한다
+	// postgre 에서 			id        SERIAL PRIMARY KEY, 로 사용
+	// postgre 	는 한번에 실행할 수 없다.
+	// 두번에 나눠 쿼리 실행
+	//
 	statement, err := database.Prepare(
+
 		`CREATE TABLE IF NOT EXISTS todos (
 			id        SERIAL PRIMARY KEY,
 			sessionId STRING,
 			name      TEXT,
 			completed BOOLEAN,
 			createdAt DATETIME
-		);
-		CREATE INDEX IF NOT EXISTS sessionIdIndexOnTodos ON todos (
+		);`)
+	if err != nil {
+		panic(err)
+	}
+
+	// 실행
+	_, err = statement.Exec()
+	if err != nil {
+		panic(err)
+	}
+	statement, err = database.Prepare(
+		`CREATE INDEX IF NOT EXISTS sessionIdIndexOnTodos ON todos (
 			sessionId ASC
 		);`)
 
