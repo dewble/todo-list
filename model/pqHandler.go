@@ -96,7 +96,7 @@ func (s *pqHandler) Close() {
 }
 
 func newPQHandler(dbConn string) DBHandler {
-	database, err := sql.Open("postgre", dbConn)
+	database, err := sql.Open("postgres", dbConn)
 	if err != nil {
 		panic(err)
 	}
@@ -108,7 +108,7 @@ func newPQHandler(dbConn string) DBHandler {
 	// AUTOINCREMENT 값이 자동으로 하나씩 증가한다
 	statement, err := database.Prepare(
 		`CREATE TABLE IF NOT EXISTS todos (
-			id        INTEGER  PRIMARY KEY AUTOINCREMENT,
+			id        SERIAL PRIMARY KEY,
 			sessionId STRING,
 			name      TEXT,
 			completed BOOLEAN,
