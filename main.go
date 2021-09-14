@@ -10,7 +10,7 @@ import (
 func main() {
 
 	port := os.Getenv("PORT")
-	m := app.MakeHandler("./test.db")
+	m := app.MakeHandler(os.Getenv("DATABASE_URL"))
 
 	// app이 종료되기전에 Close 호출
 	defer m.Close()

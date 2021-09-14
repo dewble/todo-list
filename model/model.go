@@ -21,9 +21,10 @@ type DBHandler interface {
 }
 
 // NewDBHandler() 를 만들어 이 인터페이스 자체를 외부로 노출하고 안에 아래 function 이동
-func NewDBHandler(filepath string) DBHandler {
+func NewDBHandler(dbConn string) DBHandler {
 	//handler = newMemoryHandler()
-	return newSqliteHandler(filepath)
+	// return newSqliteHandler(filepath)
+	return newPQHandler(dbConn)
 }
 
 /*
