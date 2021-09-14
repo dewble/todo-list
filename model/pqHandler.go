@@ -106,10 +106,15 @@ func newPQHandler(dbConn string) DBHandler {
 	// 여러줄은 ``
 	// todos table이 없으면 만들어라
 	// AUTOINCREMENT 값이 자동으로 하나씩 증가한다
+
+	/*
+		postgre로 변경
+	*/
 	// postgre 에서 			id        SERIAL PRIMARY KEY, 로 사용
 	// postgre 	는 한번에 실행할 수 없다.
 	// 두번에 나눠 쿼리 실행
 	// postgre 는 string이 없다 -> 	sessionId VARCHAR(256),
+	// DATETIME -> TIMESTAMP
 	statement, err := database.Prepare(
 
 		`CREATE TABLE IF NOT EXISTS todos (
@@ -117,7 +122,7 @@ func newPQHandler(dbConn string) DBHandler {
 			sessionId VARCHAR(256),
 			name      TEXT,
 			completed BOOLEAN,
-			createdAt DATETIME
+			createdAt TIMESTAMP
 		);`)
 	if err != nil {
 		panic(err)
