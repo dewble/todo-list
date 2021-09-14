@@ -109,12 +109,12 @@ func newPQHandler(dbConn string) DBHandler {
 	// postgre 에서 			id        SERIAL PRIMARY KEY, 로 사용
 	// postgre 	는 한번에 실행할 수 없다.
 	// 두번에 나눠 쿼리 실행
-	//
+	// postgre 는 string이 없다 -> 	sessionId VARCHAR(256),
 	statement, err := database.Prepare(
 
 		`CREATE TABLE IF NOT EXISTS todos (
 			id        SERIAL PRIMARY KEY,
-			sessionId STRING,
+			sessionId VARCHAR(256),
 			name      TEXT,
 			completed BOOLEAN,
 			createdAt DATETIME
