@@ -38,15 +38,20 @@ func (s *pqHandler) GetTodos(sessionId string) []*Todo {
 
 func (s *pqHandler) AddTodo(name string, sessionId string) *Todo {
 	// postgre는 datetime을 지원하지 않는다. datetime('now')) -> now()
-	stmt, err := s.db.Prepare("INSERT INTO todos (sessionId, name, completed, createdAt) VALUES ($1, $2, $3, now())")
+	stmt, err := s.db.Prepare("INSERT INTO todos (sessionId, name, completed, createdAt) VALUES ($1, $2, $3, now()) RETURNING id")
 	if err != nil {
 		panic(err)
 	}
-	rst, err := stmt.Exec(sessionId, name, false)
+	// rst, err := stmt.Exec(sessionId, name, false)
+
+	// postgre는 LastInsertId를 지원하지 않는다. 아래와 같이 변경해준다
+	var id int // id를 만들고 id를 query로 채워준다
+	err = stmt.QueryRow(sessionId, name, false).Scan(&id)
 	if err != nil {
 		panic(err)
 	}
-	id, _ := rst.LastInsertId()
+	//id, _ := rst.LastInsertId()
+
 	var todo Todo
 	todo.ID = int(id)
 	todo.Name = name
@@ -118,7 +123,6 @@ func newPQHandler(dbConn string) DBHandler {
 	// postgre 는 string이 없다 -> 	sessionId VARCHAR(256),
 	// DATETIME -> TIMESTAMP
 	statement, err := database.Prepare(
-
 		`CREATE TABLE IF NOT EXISTS todos (
 			id        SERIAL PRIMARY KEY,
 			sessionId VARCHAR(256),
