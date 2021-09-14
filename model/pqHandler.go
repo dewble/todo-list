@@ -17,7 +17,8 @@ func (s *pqHandler) GetTodos(sessionId string) []*Todo {
 	todos := []*Todo{}
 
 	// 세션에 해당하는것만 가쟈온다
-	rows, err := s.db.Query("SELECT id, name, completed, createdAt FROM todos WHERE sessionId=?", sessionId)
+	// postgre는 ? 를 지원하지 않는다. ? -> $1, $2 사용
+	rows, err := s.db.Query("SELECT id, name, completed, createdAt FROM todos WHERE sessionId=$1", sessionId)
 	if err != nil {
 		panic(err)
 	}
@@ -36,7 +37,8 @@ func (s *pqHandler) GetTodos(sessionId string) []*Todo {
 }
 
 func (s *pqHandler) AddTodo(name string, sessionId string) *Todo {
-	stmt, err := s.db.Prepare("INSERT INTO todos (sessionId, name, completed, createdAt) VALUES (?, ?, ?, datetime('now'))")
+	// postgre는 datetime을 지원하지 않는다. datetime('now')) -> now()
+	stmt, err := s.db.Prepare("INSERT INTO todos (sessionId, name, completed, createdAt) VALUES ($1, $2, $3, now())")
 	if err != nil {
 		panic(err)
 	}
@@ -54,7 +56,7 @@ func (s *pqHandler) AddTodo(name string, sessionId string) *Todo {
 }
 
 func (s *pqHandler) RemoveTodo(id int) bool {
-	stmt, err := s.db.Prepare("DELETE FROM todos WHERE id=?")
+	stmt, err := s.db.Prepare("DELETE FROM todos WHERE id=$1")
 	if err != nil {
 		panic(err)
 	}
@@ -73,7 +75,7 @@ func (s *pqHandler) RemoveTodo(id int) bool {
 func (s *pqHandler) CompleteTodo(id int, complete bool) bool {
 	// 기존 레코드는 두고 completed 값만 변경
 
-	stmt, err := s.db.Prepare("UPDATE todos SET completed=? WHERE id=?")
+	stmt, err := s.db.Prepare("UPDATE todos SET completed=$1 WHERE id=$2")
 	if err != nil {
 		panic(err)
 	}
